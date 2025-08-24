@@ -1,12 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Stocks App</title>
-  </head>
-  <body>
-    <h1 style="text-align:center; padding:20px;">📈 My Stocks App</h1>
-    <p style="text-align:center;">This is the deployed version running on GitHub Pages 🚀</p>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stocks Manager</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+  <div id="root"></div>
+
+  <!-- Your React Component -->
+  <script type="text/babel">
+  import React, { useEffect, useMemo, useState } from "react";
+
+// === Stocks Website — Single-file React component ===
+// Preloaded with 149 stocks from your PDF, showing only symbols.
+
+const STORAGE_KEY = "stocks-site-v1";
+
+const SAMPLE_STOCKS = [
+  { symbol: "3MINDIA" },
+  { symbol: "AARTIIND" },
+  { symbol: "ABBOTINDIA" },
+  { symbol: "ACE" },
+  { symbol: "ACUTAAS" },
+  { symbol: "AFFLE" },
+  { symbol: "AIAENG" },
+  { symbol: "ALKYLAMINE" },
+  { symbol: "ANGELONE" },
+  { symbol: "APARINDS" },
+  { symbol: "APLAPOLLO" },
+  { symbol: "ASIANPAINT" },
+  { symbol: "ASTEC" },
+  { symbol: "ASTRAL" },
+  { symbol: "DMART" },
+  { symbol: "BSE" },
+  { symbol: "BAJAJ-AUTO" },
+  { symbol: "BAJFINANCE" },
+  { symbol: "BAJAJFINSV" },
+  { symbol: "BALAMINES" },
+  { symbol: "BALKRISIND" },
+  { symbol: "BHARATRAS" },
+  { symbol: "BIKAJI" },
+  { symbol: "BLS" },
+  { symbol: "BLUESTARCO" },
+  { symbol: "BRITANNIA" },
+  { symbol: "CAPLIPOINT" },
+  { symbol: "CARBORUNIV" },
+  { symbol: "CARYSIL" },
+  { symbol: "CDSL" },
+  { symbol: "CERA" },
+  { symbol: "CHOLAFIN" },
+  { symbol: "CIPLA" },
+  { symbol: "CUB" },
+  { symbol: "COFORGE" },
+  { symbol: "COLPAL" },
+  { symbol: "CAMS" },
+  { symbol: "CONTROLPR" },
+  { symbol: "CRAFTSMAN" },
+  { symbol: "CRISIL" },
+  { symbol: "DATAPATTNS" },
+  { symbol: "DEEPAKNTR" },
+  { symbol: "DIVISLAB" },
+  { symbol: "DIXON" },
+  { symbol: "LALPATHLAB" },
+  { symbol: "EICHERMOT" },
+  { symbol: "ELGIEQUIP" },
+  { symbol: "ESABINDIA" },
+  { symbol: "FAIRCHEMOR" },
+  { symbol: "FIEMIND" },
+  { symbol: "FINEORG" },
+  { symbol: "FCL" },
+  { symbol: "GMMPFAUDLR" },
+  { symbol: "GALAXYSURF" },
+  { symbol: "GILLETTE" },
+  { symbol: "GRINDWELL" },
+  { symbol: "GUFICBIO" },
+  { symbol: "GUJGASLTD" },
+  { symbol: "HBLENGINE" },
+  { symbol: "HDFCLIFE" },
+  { symbol: "HLEGLAS" },
+  { symbol: "HAVELLS" },
+  { symbol: "HDFCBANK" },
+  { symbol: "HAL" },
+  { symbol: "HNDFDS" },
+  { symbol: "POWERINDIA" },
+  { symbol: "ICICIGI" },
+  { symbol: "ICICIBANK" },
+  { symbol: "INDIAMART" },
+  { symbol: "IEX" },
+  { symbol: "IRCTC" },
+  { symbol: "IGL" },
+  { symbol: "NAUKRI" },
+  { symbol: "IONEXCHANG" },
+  { symbol: "JASH" },
+  { symbol: "KFINTECH" },
+  { symbol: "KPITTECH" },
+  { symbol: "KSB" },
+  { symbol: "KAJARIACER" },
+  { symbol: "KEI" },
+  { symbol: "KOTAKBANK" },
+  { symbol: "KOVAI" },
+  { symbol: "KRISHANA" },
+  { symbol: "LTIM" },
+  { symbol: "LIKHITHA" },
+  { symbol: "MSTCLTD" },
+  { symbol: "MGL" },
+  { symbol: "MASTEK" },
+  { symbol: "METROPOLIS" },
+  { symbol: "MOLDTKPAC" },
+  { symbol: "MOTILALOFS" },
+  { symbol: "MRF" },
+  { symbol: "BECTORFOOD" },
+  { symbol: "NGLFINE" },
+  { symbol: "NH" },
+  { symbol: "NAVINFLUOR" },
+  { symbol: "NESCO" },
+  { symbol: "NESTLEIND" },
+  { symbol: "NEULANDLAB" },
+  { symbol: "NEWGEN" },
+  { symbol: "OFSS" },
+  { symbol: "PSPPROJECT" },
+  { symbol: "PAGEIND" },
+  { symbol: "PERMAGN" },
+  { symbol: "PERSISTENT" },
+  { symbol: "PIIND" },
+  { symbol: "PIDILITIND" },
+  { symbol: "POLYMED" },
+  { symbol: "POLYCAB" },
+  { symbol: "POWERGRID" },
+  { symbol: "PRIVISCL" },
+  { symbol: "RHIM" },
+  { symbol: "RAINBOW" },
+  { symbol: "RAJRATAN" },
+  { symbol: "RELAXO" },
+  { symbol: "RPGLIFE" },
+  { symbol: "SAFARI" },
+  { symbol: "SAKSOFT" },
+  { symbol: "SAREGAMA" },
+  { symbol: "SCHAEFFLER" },
+  { symbol: "SHANTIGEAR" },
+  { symbol: "SBCL" },
+  { symbol: "SIEMENS" },
+  { symbol: "SIRCA" },
+  { symbol: "SOLARINDS" },
+  { symbol: "SONATSOFTW" },
+  { symbol: "SRF" },
+  { symbol: "SUMICHEM" },
+  { symbol: "SUNPHARMA" },
+  { symbol: "SUPREMEIND" },
+  { symbol: "SYRMA" },
+  { symbol: "TATACONSUM" },
+  { symbol: "TCS" },
+  { symbol: "TATAELXSI" },
+  { symbol: "TATAPOWER" },
+  { symbol: "TCIEXP" },
+  { symbol: "ANUP" },
+  { symbol: "TIMKEN" },
+  { symbol: "TIPSMUSIC" },
+  { symbol: "TITAN" },
+  { symbol: "TORNTPHARM" },
+  { symbol: "TRENT" },
+  { symbol: "TRITURBINE" },
+  { symbol: "TIINDIA" },
+  { symbol: "UNOMINDA" },
+  { symbol: "VGUARD" },
+  { symbol: "VBL" },
+  { symbol: "VINATIORGA" },
+  { symbol: "VIPIND" },
+];
+
+function useLocalStorageStocks() {
+  const [stocks, setStocks] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return SAMPLE_STOCKS;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stocks));
+    } catch {}
+  }, [stocks]);
+
+  return [stocks, setStocks];
+}
+
+const PageSize = 25;
+
+export default function StocksSite() {
+  const [stocks, setStocks] = useLocalStorageStocks();
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q ? stocks.filter(r => (r.symbol || "").toLowerCase().includes(q)) : stocks;
+  }, [stocks, query]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PageSize));
+  const pageData = filtered.slice((page - 1) * PageSize, page * PageSize);
+
+  useEffect(() => {
+    setPage(1);
+  }, [query, stocks.length]);
+
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+      <header className="sticky top-0 z-10 backdrop-blur bg-white/80 border-b">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-gray-900 text-white grid place-items-center font-bold">S</div>
+            <h1 className="text-xl md:text-2xl font-semibold">Stocks List (149 symbols)</h1>
+          </div>
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search symbols..."
+            className="w-full md:w-80 rounded-2xl border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-300"
+          />
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 py-6">
+        <div className="rounded-2xl border overflow-hidden bg-white shadow-sm">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="text-left px-3 py-2 text-xs uppercase tracking-wide">#</th>
+                <th className="text-left px-3 py-2 text-xs uppercase tracking-wide">Symbol</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pageData.map((row, i) => {
+                const idxAbs = (page - 1) * PageSize + i;
+                return (
+                  <tr key={idxAbs} className="border-t">
+                    <td className="px-3 py-2 text-gray-500">{idxAbs + 1}</td>
+                    <td className="px-3 py-2 font-medium">{row.symbol}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="flex flex-wrap gap-2 justify-center items-center mt-4">
+          <button disabled={page === 1} onClick={() => setPage(1)} className="px-3 py-1 rounded-xl border disabled:opacity-50">« First</button>
+          <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="px-3 py-1 rounded-xl border disabled:opacity-50">Prev</button>
+          <span className="px-3 py-1">Page {page} of {totalPages}</span>
+          <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="px-3 py-1 rounded-xl border disabled:opacity-50">Next</button>
+          <button disabled={page === totalPages} onClick={() => setPage(totalPages)} className="px-3 py-1 rounded-xl border disabled:opacity-50">Last »</button>
+        </div>
+      </main>
+
+      <footer className="py-10 text-center text-xs text-gray-500">
+        Built with ❤️ — 149-stock symbols site. Data is stored locally in your browser.
+      </footer>
+    </div>
+  );
+}
+
+
+  ReactDOM.render(<StocksApp />, document.getElementById('root'));
+  </script>
+</body>
 </html>
